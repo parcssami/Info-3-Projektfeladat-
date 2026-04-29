@@ -1,0 +1,35 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
+#include <vector>
+#include <list>
+#include<utility>
+#include<iostream>
+
+
+using namespace std;
+class Bipartite_Graph {
+private:
+	vector<list<int>> component_A;
+	vector<list<int>> component_B;
+	list<pair<int, int>> edges;
+public:
+	Bipartite_Graph(int a, int b);
+	void AddEdge(int a, int b);
+	void DeleteEdge(int a, int b);
+	int NumVertex() const;
+	int NumVertex_A()const ;
+	int NumVertex_B() const;
+	int NumEdge()const;
+	bool AreConnected(int a, int b)const;
+	void AddVertex_A();
+	void AddVertex_B();
+	void RemoveVertex_A(int a);
+	void RemoveVertex_B(int b);
+	list<int> Neighbours_Of_A(int a)const;
+	list<int> Neighbours_Of_B(int b)const;
+
+};
+
+
+#endif

@@ -1,0 +1,112 @@
+Pszheudo kód : 
+(Bemenet : G(A,B,E) M(C,D,M_E))
+
+M <- {/} // ha M-et nem adttuk meg máskülönben//  M <- M(C,D,M_E);
+Ciklus
+  Modosított BFS // P javító út az M-ben
+  Ha nem létezik javító út akkor; stop;
+  különben:
+ M <- M\ {P páros távolságfüggvénnyel rendelkező elemei avagy sorszáma} U {P páratlan távolságfüggvénnyel réndelkező elemi avagy sorszáma}
+Ciklus 
+
+
+//Modosított BFS Páros gráfhoz (G (A,B,E) és M(C,D,E)//
+
+G = G(A,B,E) minden a[i] eleme (A\M) 
+L <- (A\M); aktiv_cúcs <- *
+minden v eleme G(A,B) : v =/= valamilyen a[i](elkeldöntenünk hogy mindegyik A\M elemen leszeretnénk futatni vagy egyesével végig mejünk rajta) : táv(v) <- végtelen;
+táv(a[i])=0;
+minden v eleme G(A,B) elöző v <- *
+ ciklus amíg L nem üres 
+                       aktiv_csúcs <- L első tagja : aktiv_csúcs : törlés L-ből
+        ciklus v végig fut aktív_csús szomszédjain
+                ha táv(aktív_csús):páros //akkor aktiv_csúcs eleme A-nak ezért // v végig fut aktív_csús összes szomszédján
+					 v hozzáfűzése L végére 
+				     táv(v) <-táv(aktiv_csúcs) + 1
+				     eloző(v) <- aktiv_csúcs
+     			ha táv(aktív_csús):páratlan // akkor akkor aktiv_csúcs eleme B ezért csak egyetlen szomszédja van M-ben(ha van ilyen)
+                    v hozzáfűzése L végére
+                    táv(v) <-táv(aktiv_csúcs) + 1
+				    eloző(v) <- aktiv_csúcs			
+        ciklus vége 
+ ciklus vége		
+ 
+ 
+ 
+ ChatGPT javítás benne 
+ 
+ // Módosított BFS páros gráfhoz
+// Bemenet: G(A,B,E) és M(C,D,M_E)
+// Itt A\M alatt A\C-t értjük, vagyis azokat az A-beli csúcsokat,
+// amelyeket M nem fed le.
+
+A1 <- A\M
+
+L <- üres sor
+aktív_csúcs <- *
+
+minden v eleme G(A,B):
+    táv(v) <- végtelen
+    előző(v) <- *
+
+minden a[i] eleme A1:
+    táv(a[i]) <- 0
+    a[i] hozzáfűzése L végére
+
+Ciklus amíg L nem üres:
+
+    aktív_csúcs <- L első tagja
+    aktív_csúcs törlése L-ből
+
+    Ha táv(aktív_csúcs) páros akkor:
+        // aktív_csúcs eleme A-nak,
+        // ezért v végigfut aktív_csúcs összes szomszédján
+
+        Ciklus v végigfut aktív_csúcs összes szomszédján:
+
+            Ha táv(v) = végtelen akkor:
+
+                v hozzáfűzése L végére
+                táv(v) <- táv(aktív_csúcs) + 1
+                előző(v) <- aktív_csúcs
+
+                Ha v eleme B-nek és v nem eleme D-nek akkor:
+                    // v-t M nem fedi le, tehát javítóutat találtunk
+
+                    P <- üres út
+                    x <- v
+
+                    Ciklus amíg x =/= *:
+                        x hozzáfűzése P elejéhez
+                        x <- előző(x)
+
+                    visszaad P
+
+            Elágazás vége
+
+        Ciklus vége
+
+    Különben, ha táv(aktív_csúcs) páratlan akkor:
+        // aktív_csúcs eleme B-nek,
+        // ezért csak az M szerinti párjára léphetünk tovább, ha van ilyen
+
+        Ha aktív_csúcs eleme D-nek akkor:
+
+            v <- aktív_csúcs M szerinti párja
+            // vagyis az a v eleme C-nek, amelyre v-aktív_csúcs eleme M_E
+
+            Ha táv(v) = végtelen akkor:
+
+                v hozzáfűzése L végére
+                táv(v) <- táv(aktív_csúcs) + 1
+                előző(v) <- aktív_csúcs
+
+            Elágazás vége
+
+        Elágazás vége
+
+    Elágazás vége
+
+Ciklus vége
+
+visszaad: nincs javítóút
