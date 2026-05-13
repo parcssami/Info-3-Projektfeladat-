@@ -68,44 +68,68 @@ Bipartite_Graph Konig_Denes(const Bipartite_Graph& G, Bipartite_Graph M) {
     // 4. LEPES:
     // Kőnig-keplet:
     // minimum lefogo csucshalmaz = (A \ Z_A) U (B metszet Z_B)
+int marker_A_size;
 
-    Bipartite_Graph cover_graph(n_A, n_B);
+if (n_A > n_B) {
+    marker_A_size = n_A;
+}
+else {
+    marker_A_size = n_B;
+}
 
-    // A \ Z_A:
-    // azok az A-oldali csucsok kerulnek be, amelyeket NEM ertunk el.
-    for (int a = 1; a <= n_A; a++) {
-        if (!visited_A[a]) {
-            // Jeloles: A_a benne van a lefogo csucshalmazban.
-            // Mivel a Bipartite_Graph csak eleket tud tarolni,
-            // egy jelolo elet teszunk be.
-            if (a <= n_B) {
-                cover_graph.AddEdge(a, a);
-            }
-        }
+// Jelölőgráf:
+// B1 marker: A-oldali lefogó csúcs
+// B2 marker: B-oldali lefogó csúcs
+Bipartite_Graph cover_graph(marker_A_size, 2);
+
+// A \ Z_A:
+// azok az A-oldali csúcsok kerülnek be,
+// amelyeket NEM értünk el.
+for (int a = 1; a <= n_A; a++) {
+    if (!visited_A[a]) {
+        // A_a benne van a lefogó csúcshalmazban.
+        // Ezt cover_graph-ban A_a - B1 jelöli.
+        cover_graph.AddEdge(a, 1);
     }
+}
 
-    // B metszet Z_B:
-    // azok a B-oldali csucsok kerulnek be, amelyeket elertunk.
-    for (int b = 1; b <= n_B; b++) {
-        if (visited_B[b]) {
-            // Jeloles: B_b benne van a lefogo csucshalmazban.
-            if (b <= n_A) {
-                cover_graph.AddEdge(b, b);
-            }
-        }
+// B ∩ Z_B:
+// azok a B-oldali csúcsok kerülnek be,
+// amelyeket elértünk.
+for (int b = 1; b <= n_B; b++) {
+    if (visited_B[b]) {
+        // B_b benne van a lefogó csúcshalmazban.
+        // Ezt cover_graph-ban A_b - B2 jelöli.
+        cover_graph.AddEdge(b, 2);
     }
+}
 
-    return cover_graph;
+return cover_graph;   
 }
 
 void Print_Konig_Cover(const Bipartite_Graph& cover_graph) {
     vector<list<int>> A = cover_graph.GetA();
 
-    cout << "Minimalis lefogo csucshalmaz jelolo graf elei:" << endl;
+    cout << "Minimalis lefogo csucshalmaz:" << endl;
 
-    for (int a = 1; a <= cover_graph.NumVertex_A(); a++) {
-        for (int b : A[a - 1]) {
-            cout << "A" << a << " - B" << b << endl;
+    bool ures = true;
+
+    for (int i = 1; i <= cover_graph.NumVertex_A(); i++) {
+        for (int marker : A[i - 1]) {
+            if (marker == 1) {
+                cout << "A" << i << endl;
+                ures = false;
+            }
+            else if (marker == 2) {
+                cout << "B" << i << endl;
+                ures = false;
+            }
         }
     }
+
+    if (ures) {
+        cout << "Ures lefogo csucshalmaz." << endl;
+    }
+
+    cout << endl;
 }

@@ -17,7 +17,7 @@ vector<int> Modified_BFS(const Bipartite_Graph& G, const Bipartite_Graph& M);
 
 bool Is_Matching_Edge(const Bipartite_Graph& M, int a, int b);
 
-void Improve_Matching(Bipartite_Graph& M, const vector<int>& path);
+void Improve_Matching(Bipartite_Graph& M, const vector<int>& P);
 
 void Maximum_Matching(Bipartite_Graph& G, Bipartite_Graph& M);
 

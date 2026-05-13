@@ -7,156 +7,109 @@
 
 using namespace std;
 
-void Print_Graph(const Bipartite_Graph& G) {
-    vector<list<int>> A = G.GetA();
+int main() {
+    int n_A = 645;
+    int n_B = 355;
 
-    cout << "Graf elei:" << endl;
+    Bipartite_Graph G(n_A, n_B);
 
-    for (int a = 1; a <= G.NumVertex_A(); a++) {
-        for (int b : A[a - 1]) {
-            cout << "A" << a << " - B" << b << endl;
+    /*
+        Nem triviális nagy páros gráf generálása.
+
+        A-oldal: 645 csúcs
+        B-oldal: 355 csúcs
+
+        Minden A-csúcshoz 20 B-szomszédet adunk.
+        Összes él: 645 * 20 = 12900.
+
+        A képlet:
+        b = ((73 * (a - 1) + 37 * k) % n_B) + 1
+
+        Miért jó?
+        - Nem az egyszerű A1-B1, A2-B2, ... diagonált adja.
+        - A 73 és a 355 relatív prímek.
+        - Ezért az első 355 A-csúcs k = 0 esetén permutálva fedi le a B-oldalt.
+        - Tehát garantáltan van 355 elemű párosítás.
+    */
+
+    for (int a = 1; a <= n_A; a++) {
+        for (int k = 0; k < 20; k++) {
+            int b = ((73 * (a - 1) + 37 * k) % n_B) + 1;
+            G.AddEdge(a, b);
         }
     }
 
+    cout << "Nagy nem trivialis paros graf letrehozva." << endl;
+    cout << "A-oldali csucsok szama: " << n_A << endl;
+    cout << "B-oldali csucsok szama: " << n_B << endl;
+    cout << "Osszes csucs: " << n_A + n_B << endl;
+    cout << "Elvart elek szama: " << n_A * 20 << endl;
+    cout << "Graph osztaly NumEdge() erteke: " << G.NumEdge() << endl;
     cout << endl;
-}
 
-
-
-int main() {
-    // Nagyobb tesztgráf:
-    // A = {A1, A2, ..., A15}
-    // B = {B1, B2, ..., B18}
-
-    Bipartite_Graph G(15, 18);
-
-    // A1 szomszédai
-    G.AddEdge(1, 1);
-    G.AddEdge(1, 4);
-    G.AddEdge(1, 7);
-    G.AddEdge(1, 10);
-
-    // A2 szomszédai
-    G.AddEdge(2, 2);
-    G.AddEdge(2, 5);
-    G.AddEdge(2, 8);
-    G.AddEdge(2, 11);
-
-    // A3 szomszédai
-    G.AddEdge(3, 3);
-    G.AddEdge(3, 6);
-    G.AddEdge(3, 9);
-    G.AddEdge(3, 12);
-
-    // A4 szomszédai
-    G.AddEdge(4, 1);
-    G.AddEdge(4, 5);
-    G.AddEdge(4, 13);
-    G.AddEdge(4, 14);
-
-    // A5 szomszédai
-    G.AddEdge(5, 2);
-    G.AddEdge(5, 6);
-    G.AddEdge(5, 10);
-    G.AddEdge(5, 15);
-
-    // A6 szomszédai
-    G.AddEdge(6, 3);
-    G.AddEdge(6, 7);
-    G.AddEdge(6, 11);
-    G.AddEdge(6, 16);
-
-    // A7 szomszédai
-    G.AddEdge(7, 4);
-    G.AddEdge(7, 8);
-    G.AddEdge(7, 12);
-    G.AddEdge(7, 17);
-
-    // A8 szomszédai
-    G.AddEdge(8, 5);
-    G.AddEdge(8, 9);
-    G.AddEdge(8, 13);
-    G.AddEdge(8, 18);
-
-    // A9 szomszédai
-    G.AddEdge(9, 6);
-    G.AddEdge(9, 10);
-    G.AddEdge(9, 14);
-    G.AddEdge(9, 1);
-
-    // A10 szomszédai
-    G.AddEdge(10, 7);
-    G.AddEdge(10, 11);
-    G.AddEdge(10, 15);
-    G.AddEdge(10, 2);
-
-    // A11 szomszédai
-    G.AddEdge(11, 8);
-    G.AddEdge(11, 12);
-    G.AddEdge(11, 16);
-    G.AddEdge(11, 3);
-
-    // A12 szomszédai
-    G.AddEdge(12, 9);
-    G.AddEdge(12, 13);
-    G.AddEdge(12, 17);
-    G.AddEdge(12, 4);
-
-    // A13 szomszédai
-    G.AddEdge(13, 10);
-    G.AddEdge(13, 14);
-    G.AddEdge(13, 18);
-    G.AddEdge(13, 5);
-
-    // A14 szomszédai
-    G.AddEdge(14, 11);
-    G.AddEdge(14, 15);
-    G.AddEdge(14, 1);
-    G.AddEdge(14, 6);
-
-    // A15 szomszédai
-    G.AddEdge(15, 12);
-    G.AddEdge(15, 16);
-    G.AddEdge(15, 2);
-    G.AddEdge(15, 7);
-
-    cout << "Eredeti nagy paros graf:" << endl;
-    Print_Graph(G);
-
-    // Kezdetben üres párosítás
-    Bipartite_Graph M(15, 18);
+    Bipartite_Graph M(n_A, n_B);
 
     vector<int> P = Modified_BFS(G, M);
 
     int lepes = 1;
 
-    cout << "Parositas javitasa BFS-ekkel:" << endl;
+    cout << "Javito algoritmus futtatasa..." << endl;
+    cout << endl;
 
     while (!P.empty()) {
-        cout << lepes << ". javito ut: ";
-        Print_BFS_Path(P);
-
         Improve_Matching(M, P);
 
-        cout << "Aktualis parositas elemszama: " << M.NumEdge() << endl;
-        cout << endl;
+        if (lepes <= 10 || lepes % 25 == 0) {
+            cout << lepes << ". javitas utan M elemszama: "
+                 << M.NumEdge() << endl;
+        }
 
         P = Modified_BFS(G, M);
         lepes++;
     }
 
+    cout << endl;
     cout << "Nincs tobb javito ut." << endl;
-    cout << "Maximalis parositas elemszama: " << M.NumEdge() << endl;
+    cout << "Vegleges maximalis parositas elemszama: "
+         << M.NumEdge() << endl;
+
+    cout << "Elmeleti maximum: " << n_B << endl;
+
+    if (M.NumEdge() == n_B) {
+        cout << "SIKER: minden B-oldali csucs parositva lett." << endl;
+    }
+    else {
+        cout << "FIGYELEM: nem sikerult minden B-oldali csucsot parositani." << endl;
+    }
+
     cout << endl;
 
-    cout << "Maximalis parositas elei:" << endl;
-    Print_Graph(M);
+    cout << "Vegleges M parositas elso 40 eleme:" << endl;
 
-    cout << "Konig Denes algoritmus eredmenye:" << endl;
+    vector<list<int>> M_A = M.GetA();
+
+    int printed = 0;
+
+    for (int a = 1; a <= M.NumVertex_A(); a++) {
+        for (int b : M_A[a - 1]) {
+            if (printed < 355) {
+                cout << "A" << a << " - B" << b << endl;
+                printed++;
+            }
+        }
+    }
+
+    cout << endl;
+    cout << "Kiirt parositasi elek szama: " << printed << endl;
+    cout << "A teljes M merete: " << M.NumEdge() << endl;
+
+    cout << endl;
+    cout << "Konig Denes algoritmus futtatasa..." << endl;
 
     Bipartite_Graph cover_graph = Konig_Denes(G, M);
 
-    Print_Konig_Cover(cover_graph);
+    cout << "Konig jelolograf elemszama: "
+         << cover_graph.NumEdge() << endl;
 
     return 0;
 }
